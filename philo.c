@@ -42,7 +42,7 @@ int	ft_atoi(char *str, int *ag_philo)
 	return (1);
 }
 
-int	ft_init(int ag, char **av, t_philo *philo)
+int	ft_init(int ag, char **av, t_main_philo *philo)
 {
 	if (ag >= 5 && ag <= 6)
 	{
@@ -69,9 +69,10 @@ int	ft_init(int ag, char **av, t_philo *philo)
 
 int	main(int ag, char **av)
 {
-	t_philo	philo;
+    t_main_philo	philo;
 
 	if (!ft_init(ag, av, &philo))
 		return (0);
-	
+	if (!philo_create(&philo))
+        return (0);
 }
