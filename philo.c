@@ -70,7 +70,11 @@ int	ft_init(int ag, char **av, t_main_philo *philo)
 int	main(int ag, char **av)
 {
     t_main_philo	philo;
+	// struct timeval	start;
 
+	// gettimeofday(&start, 0);
+	gettimeofday(&(philo.start_time), 0);
+	// philo.start_time = &start;
 	if (!ft_init(ag, av, &philo))
 		return (0);
 	if (!philo_create(&philo))
