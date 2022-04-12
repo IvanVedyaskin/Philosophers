@@ -73,7 +73,6 @@ int	main(int ag, char **av)
 	// struct timeval	start;
 
 	// gettimeofday(&start, 0);
-	gettimeofday(&(philo.start_time), 0);
 	// philo.start_time = &start;
 	if (!ft_init(ag, av, &philo))
 		return (0);

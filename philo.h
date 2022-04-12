@@ -9,18 +9,17 @@
 
 typedef struct s_main_philo
 {
-	int	num_of_philo;
-	int	time_to_die;
-	int	time_to_eat;
-	int	time_to_sleep;
-	int num_must_eat;
-	struct timeval	start_time;
+	int				num_of_philo;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				num_must_eat;
 }	t_main_philo;
 
 typedef struct s_other_philos
 {
 	pthread_mutex_t	right;
-	pthread_mutex_t	left;
+	pthread_mutex_t	*left;
 	pthread_t		id;
 	pthread_mutex_t	time;
 	int				num;
@@ -28,7 +27,8 @@ typedef struct s_other_philos
 	int				time_to_eat;
 	int				time_to_sleep;
 	struct timeval	eating_time;
-}   t_philos;
+	struct timeval	start_time;
+}	t_philos;
 
 // t_philos    *list_init(t_main_philo *data);
 // int         free_lists(t_philos **philos);
