@@ -22,7 +22,8 @@ typedef struct s_other_philos
 	pthread_mutex_t	*left;
 	pthread_t		id;
 	pthread_mutex_t	time;
-	int				num;
+	int				index;
+	int				max;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
@@ -35,5 +36,6 @@ typedef struct s_other_philos
 // int         create_list(t_philos **philos, t_main_philo *data);
 int		philo_create(t_main_philo *philo_main);
 void	create_list(t_philos *philos, t_main_philo *philo_main);
+void 	ft_usleep(long int time);
 
 #endif
