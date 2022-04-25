@@ -5,33 +5,51 @@
 
 void	philo_game(t_philos *philos)
 {
-	while (1)
-	{
-		pthread_mutex_lock(&(philos->time));
+    if (philos->index % 2 != 0) {
+        ft_usleep(1000);
+    }
+    gettimeofday(&(philos->start_time), 0);
+    philos->eating_time = philos->start_time;
+    philos->ms_eat.tv_sec = philos->eating_time.tv_sec - philos->start_time.tv_sec;
+    philos->ms_eat.tv_usec = philos->eating_time.tv_usec - philos->start_time.tv_usec;
+    while (1)
+    {
 		if (philos->max != 0)
 		{
 			pthread_mutex_lock((philos->left));
-			printf("Vzyal levyu vilku  № %d\n", philos->index);
+			printf("Vzyal levyu vilku  # %d\n", philos->index);
 			pthread_mutex_lock(&(philos->right));
-			printf("Vzyal pravyu vilku  № %d\n", philos->index);
+			printf("Vzyal pravyu vilku  # %d\n", philos->index);
 		}
 		else
 		{
 			pthread_mutex_lock(&(philos->right));
-			printf("Vzyal pravyu vilku  № %d\n", philos->index);
+			printf("Vzyal pravyu vilku  # %d\n", philos->index);
 			pthread_mutex_lock((philos->left));
-			printf("Vzyal levyu vilku  № %d\n", philos->index);
+			printf("Vzyal levyu vilku  # %d\n", philos->index);
 		}
 		gettimeofday(&(philos->eating_time), 0);
-		pthread_mutex_unlock(&(philos->time));
-		printf("Eating № %d\n", philos->index);
-		ft_usleep(philos->time_to_eat);
-		printf ("check_time!!! %ld\n", philos->eating_time.tv_sec);
-		pthread_mutex_unlock((philos->left));
-		pthread_mutex_unlock(&(philos->right));
-		printf ("sleep № %d\n", philos->index);
+        philos->ms_eat.tv_sec = philos->eating_time.tv_sec - philos->start_time.tv_sec;
+        philos->ms_eat.tv_usec = philos->eating_time.tv_usec - philos->start_time.tv_usec;
+        printf ("ms = %d\n", philos->ms_eat.tv_sec * 1000 + philos->ms_eat.tv_usec / 1000);
+		printf("Eating # %d\n", philos->index);
+        pthread_mutex_unlock(&(philos->time));
+        ft_usleep(philos->time_to_eat);
+        pthread_mutex_lock(&(philos->time));
+        philos->start_time = philos->eating_time;
+        printf ("check_time!!! %ld\n", philos->eating_time.tv_sec);
+        if (philos->max != 0) {
+            pthread_mutex_unlock(&(philos->right));
+            pthread_mutex_unlock((philos->left));
+        }
+        else
+        {
+            pthread_mutex_unlock((philos->left));
+            pthread_mutex_unlock(&(philos->right));
+        }
+		printf ("sleep # %d\n", philos->index);
 		ft_usleep(philos->time_to_sleep);
-		printf ("thinking № %d\n", philos->index);
+		printf ("thinking # %d\n", philos->index);
 	}
 }
 
@@ -67,18 +85,18 @@ int	is_died(t_philos *philos, t_main_philo *philo_main)
 
 	i = 0;
 	while (i < philo_main->num_of_philo)
-	{
-		pthread_mutex_lock(&(philos[i].time));
-		if (((philos[i].eating_time.tv_sec - philos[i].start_time.tv_sec) * 1000 + \
-				(philos[i].eating_time.tv_usec - philos[i].start_time.tv_usec) / 1000) > philo_main->time_to_die)
+    {
+//		pthread_mutex_lock(&(philos[i].time));
+        if (((philos[i].ms_eat.tv_sec) * 1000 + \
+				(philos[i].ms_eat.tv_usec) / 1000) > philo_main->time_to_die)
 		{
-			printf ("philo is died № %d\n", (philos[i].index));
+			printf ("philo is died # %d\n", (philos[i].index));
 			printf ("main_usec_start = %ld\n", philos[i].start_time.tv_usec);
 			printf ("philo_usec_eat = %ld\n", philos[i].eating_time.tv_usec);
 			printf ("main_sec = %ld\n", philos[i].start_time.tv_sec);
 			printf ("philo_sec = %ld\n", philos[i].eating_time.tv_sec);
 			printf ("check_die = %ld \n", (philos[i].eating_time.tv_sec - philos[i].start_time.tv_sec) * 1000 + \
-				(philos[i].eating_time.tv_usec - philos[i].start_time.tv_usec) / 1000 + philo_main->time_to_sleep);
+				(philos[i].eating_time.tv_usec - philos[i].start_time.tv_usec) / 1000);
 			i = 0;
 			while (i < philo_main->num_of_philo)
 			{
@@ -86,13 +104,12 @@ int	is_died(t_philos *philos, t_main_philo *philo_main)
 				printf ("philo_time [%d] = %ld\n", i, philos[i].eating_time.tv_sec);
 				i++;
 			}
-			exit(0);
 			return (1);
 		}
-		printf ("start_time1 %ld index = %d\n", philos[i].start_time.tv_usec, i);
-		philos[i].start_time = philos[i].eating_time;
-		printf ("start_time2 %ld\n", philos[i].start_time.tv_usec);
-		pthread_mutex_unlock(&(philos[i].time));
+//		printf ("start_time1 %ld index = %d\n", philos[i].start_time.tv_usec, i);
+//		philos[i].start_time = philos[i].eating_time;
+//		printf ("start_time2 %ld\n", philos[i].start_time.tv_usec);
+//		pthread_mutex_unlock(&(philos[i].time));
 		i++;
 	}
 	i = 0;
@@ -108,10 +125,8 @@ int philo_create(t_main_philo *philo_main)
 	create_list(philos, philo_main);
 	while (i < philo_main->num_of_philo)
 	{
-		if (i % 2 != 0)
-			ft_usleep(philos->time_to_eat);
-		gettimeofday(&(philos[i].start_time), 0);
-		printf ("time_init %ld index = %d\n", philos[i].start_time.tv_usec, i);
+//		gettimeofday(&(philos[i].start_time), 0);
+//		printf ("time_init %ld index = %d\n", philos[i].start_time.tv_usec, i);
 		pthread_create(&(philos[i].id), 0, (void *) philo_game, (void *)&philos[i]);
 		pthread_detach((philos[i].id));
 		i++;
@@ -120,6 +135,7 @@ int philo_create(t_main_philo *philo_main)
 	{
 		if (is_died(philos, philo_main) == 1)
 			return (0);
+        ft_usleep(1000);
 	}
 	return (1);
 }

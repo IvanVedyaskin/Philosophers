@@ -14,6 +14,7 @@ typedef struct s_main_philo
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				num_must_eat;
+    pthread_mutex_t	time;
 }	t_main_philo;
 
 typedef struct s_other_philos
@@ -29,6 +30,7 @@ typedef struct s_other_philos
 	int				time_to_sleep;
 	struct timeval	eating_time;
 	struct timeval	start_time;
+    struct timeval  ms_eat;
 }	t_philos;
 
 // t_philos    *list_init(t_main_philo *data);

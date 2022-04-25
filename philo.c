@@ -64,6 +64,7 @@ int	ft_init(int ag, char **av, t_main_philo *philo)
 	}
 	if (philo->num_of_philo == 0)
 		return (print_error(4));
+    pthread_mutex_init(&(philo->time), 0);
 	return (1);
 }
 
