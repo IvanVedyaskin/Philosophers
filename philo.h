@@ -40,6 +40,6 @@ typedef struct s_other_philos
 // int         create_list(t_philos **philos, t_main_philo *data);
 int		philo_create(t_main_philo *philo_main);
 int		create_list(t_philos *philos, t_main_philo *philo_main);
-void 	ft_usleep(long int time);
+struct timeval	ft_usleep(long int time);
 
 #endif

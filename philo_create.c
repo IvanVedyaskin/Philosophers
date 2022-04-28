@@ -69,13 +69,13 @@ void	philo_game(void *phil)
 		pthread_mutex_lock(philos->time);
 		gettimeofday(&(philos->eating_time), 0);
 		philos->ms_eat = (philos->eating_time.tv_sec - philos->global_time.tv_sec) * 1000 + (philos->eating_time.tv_usec - philos->global_time.tv_usec) / 1000;
-        printf ("ms = %d index = %d\n", philos->ms_eat, philos->index);
+//        printf ("ms = %d index = %d\n", philos->ms_eat, philos->index);
 		printf("Eating # %d\n", philos->index);
 		gettimeofday(&(philos->eating_time), 0);
 		philos->ms_eat = (philos->eating_time.tv_sec - philos->global_time.tv_sec) * 1000 + (philos->eating_time.tv_usec - philos->global_time.tv_usec) / 1000;
-		philos->start_time = philos->eating_time;
 		pthread_mutex_unlock(philos->time);
-		ft_usleep(philos->time_to_eat);
+		philos->eating_time = ft_usleep(philos->time_to_eat);
+		philos->start_time = philos->eating_time;
 //        printf ("check_time!!! %ld\n", philos->eating_time.tv_sec);
 //        if (philos->max != 0) {
 //            pthread_mutex_unlock(&(philos->right));
