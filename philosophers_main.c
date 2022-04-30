@@ -1,6 +1,6 @@
 #include "philosophers.h"
 
-int	print_error(int flag)
+static int	print_error(int flag)
 {
 	if (flag == 1)
 		printf ("The argument is greater than an integer!\n");
@@ -13,7 +13,7 @@ int	print_error(int flag)
 	return (0);
 }
 
-int	ft_atoi(char *str, int *ag_philo)
+static int	ft_atoi(char *str, int *ag_philo)
 {
 	int						i;
 	int						negative;
@@ -41,7 +41,7 @@ int	ft_atoi(char *str, int *ag_philo)
 	return (1);
 }
 
-int	ft_init(int ag, char **av, t_m_data *m_data)
+static int	ft_init(int ag, char **av, t_m_data *m_data)
 {
 	if (ag >= 5 && ag <= 6)
 	{
@@ -67,9 +67,9 @@ int	ft_init(int ag, char **av, t_m_data *m_data)
 	return (1);
 }
 
-int is_died(t_m_data *m_date)
+static int	is_died(t_m_data *m_data)
 {
-	int 			i;
+	int				i;
 	long int		time;
 	struct timeval	tmp;
 
@@ -77,19 +77,20 @@ int is_died(t_m_data *m_date)
 	while (1)
 	{
 		gettimeofday(&tmp, NULL);
-		while (i < m_date->n_philo)
+		while (i < m_data->n_philo)
 		{
-			time = (tmp.tv_sec - m_date->philo[i].t_eat.tv_sec) * 1000 + \
-				(tmp.tv_usec - m_date->philo[i].t_eat.tv_usec) / 1000;
-			if (time > m_date->t_to_die)
-			{
-//				pthread_mutex_lock(&m_date->std_out);
-				return (print_status(&(m_date->philo[i]), 4));
-			}
-			if (m_date->philo[i].n_eat == 0) {
-//				pthread_mutex_lock(&m_date->std_out);
-				return (print_status(&(m_date->philo[i]), 5));
-			}
+			pthread_mutex_lock(&m_data->philo[i].time);
+			time = time_count(&tmp, &m_data->philo[i].t_eat);
+			pthread_mutex_unlock(&m_data->philo[i].time);
+			pthread_mutex_lock(&m_data->philo[i].check_n_eat);
+			// if (m_data->philo[i].n_eat == 0)
+			// 	return (print_status(&(m_data->philo[i]), \
+			// 		pthread_mutex_lock(&m_data->std_out) + 5));
+			pthread_mutex_unlock(&m_data->philo[i].check_n_eat);
+			if (time > m_data->t_to_die)
+				return (print_status(&(m_data->philo[i]), \
+					pthread_mutex_lock(&m_data->std_out) + 4));
+			// pthread_mutex_unlock(&m_data->philo[i].time);
 			i++;
 		}
 		i = 0;
@@ -98,15 +99,19 @@ int is_died(t_m_data *m_date)
 	return (5);
 }
 
-int main(int ag, char **av)
+int	main(int ag, char **av)
 {
-	t_m_data m_date;
+	t_m_data	m_data;
 
-	if (!ft_init(ag, av, &m_date))
-		return (0);
-	if (!ph_mutex_tread_all(&m_date))
-		return (0);
-	usleep (1000);
-	is_died(&m_date);
-    return 0;
+	if (!ft_init(ag, av, &m_data))
+		return (write(1, "Error!\n", 7));
+	if (!ph_mutex_tread_all(&m_data))
+		return (write(1, "Error!\n", 7));
+	if (is_died(&m_data) == 4)
+	{
+		usleep (200000);
+		if (!all_destroy(&m_data))
+			return (write(1, "Error!\n", 7));
+	}
+	return (0);
 }
