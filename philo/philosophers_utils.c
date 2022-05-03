@@ -92,6 +92,8 @@ int	all_destroy(t_m_data *m_data)
 	{
 		if (pthread_mutex_destroy(&m_data->fork[i]))
 			return (0);
+		if (pthread_mutex_destroy(&m_data->philo[i].time))
+			return (0);
 		i++;
 	}
 	if (pthread_mutex_destroy(&m_data->std_out))
