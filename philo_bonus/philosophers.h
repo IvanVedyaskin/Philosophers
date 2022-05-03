@@ -30,6 +30,7 @@ typedef struct s_philo_person
 	int				_die;
 	int				n_eat;
 	int				pid;
+	int				m_die;
 	sem_t			*fork;
 	sem_t			*time;
 	sem_t			*std_out;

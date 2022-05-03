@@ -25,15 +25,12 @@ int	print_status(t_philo *philo, int status)
 {
 	struct timeval	timer;
 
+	// sem_wait(philo->time);
 	gettimeofday(&timer, NULL);
-	sem_wait(philo->time);
 	if (status == 1)
-	{
-		philo->t_eat.tv_sec = timer.tv_sec;
-		philo->t_eat.tv_usec = timer.tv_usec;
-	}
+		gettimeofday(&philo->t_eat, NULL);
 	timer.tv_usec = time_count(&timer, &philo->m_time);
-	sem_post(philo->time);
+	// sem_post(philo->time);
 	if (!status)
 		printf ("%d %d has taken a fork\n", timer.tv_usec, philo->_id);
 	else if (status == 1)

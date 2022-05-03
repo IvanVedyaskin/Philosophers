@@ -26,12 +26,6 @@ static void	check_fork(t_philo *philo)
 
 void	ph_process(t_philo *philo)
 {
-	struct timeval tmp;
-
-	// usleep((philo->_id % 2) * 1000);
-	// gettimeofday(&tmp, NULL);
-	// printf ("id2 = %d time2 = %ld\n", philo->_id, (tmp.tv_sec - philo->m_time.tv_sec) / 1000 + \
-	// 	(tmp.tv_usec - philo->m_time.tv_usec) * 1000);
 	while (1)
 	{
 		if (philo->n_eat == 0)
@@ -50,7 +44,8 @@ void	ph_process(t_philo *philo)
 		ft_usleep(philo->_sleep, NULL);
 		sem_wait(philo->std_out);
 		print_status(philo, 3);
-		usleep(sem_post(philo->std_out) + 900);
+		sem_post(philo->std_out);
+		usleep(900);
 	}
 }
 

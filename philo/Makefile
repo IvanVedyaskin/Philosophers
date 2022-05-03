@@ -12,7 +12,7 @@ CC = cc
 
 CFLAGS = -MD -Wall -Wextra -Werror -pthread
 
-FSA = -fsanitize=address
+FSA = -fsanitize=thread
 
 RM = rm -f
 
