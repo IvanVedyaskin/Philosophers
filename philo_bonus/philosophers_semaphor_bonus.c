@@ -70,7 +70,7 @@ static void	is_died(t_philo *philo)
 				print_status(philo, 4);
 			exit(EXIT_SUCCESS);
 		}
-		usleep(2000);
+		usleep(900);
 	}
 	return ;
 }
