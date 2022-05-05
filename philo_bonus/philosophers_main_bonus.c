@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "philosophers_bonus.h"
 
 static int	print_error(int flag)
 {
@@ -79,47 +79,18 @@ static int	ft_init(int ag, char **av, t_m_data *m_data)
 	return (1);
 }
 
-void	is_died(t_philo *philo)
-{
-	int				i;
-	struct timeval	tmp;
-
-	i = -1;
-	while (1)
-	{
-		gettimeofday(&tmp, NULL);
-		// sem_wait(philo->time);
-		if (time_count(&tmp, &philo->t_eat) > philo->_die)
-		{
-			// sem_post(philo->time);
-			sem_wait(philo->std_out);
-			if (check_eat(philo))
-				sem_post(philo->std_out);
-			else
-				print_status(philo, 4);
-			philo->m_die = 0;
-			return ;
-		}
-		// sem_post(philo->time);
-		usleep(2000);
-	}
-	return ;
-}
-
-int	all_semaphors(t_m_data *m_data)
+static int	all_semaphors(t_m_data *m_data)
 {
 	int		i;
 
 	i = 0;
 	m_data->fork = sem_open("eat semaphor", O_CREAT, S_IRWXU, m_data->n_philo);
-	// m_data->time = sem_open("time semaphor", O_CREAT, S_IRWXU, 1);
 	m_data->std_out = sem_open("out semaphor", O_CREAT, S_IRWXU, 1);
-	// if (*(m_data->eat) == -1 || *(m_data->time) == -1 || *(m_data->std_out) == -1)
-	// 	return (0);
+	if (m_data->fork == SEM_FAILED || m_data->std_out == SEM_FAILED)
+		exit (EXIT_FAILURE);
 	gettimeofday(&m_data->m_time, NULL);
 	while (i < m_data->n_philo)
 	{
-		// m_data->philo[i].time = m_data->time;
 		m_data->philo[i].fork = m_data->fork;
 		m_data->philo[i].std_out = m_data->std_out;
 		m_data->philo[i]._id = i + 1;
@@ -132,100 +103,29 @@ int	all_semaphors(t_m_data *m_data)
 		m_data->philo[i].m_die = 1;
 		i++;
 	}
-	return (1); 
-}
-
-int	func(t_philo *philo)
-{
-	int	i;
-
-	i = 0;
-	// gettimeofday(&philo->m_time, NULL);
-	// philo->t_eat = philo->m_time;
-	if (pthread_create(&philo->id, NULL, (void *)&is_died, (void *)philo))
-		return (kill(philo->pid, SIGKILL));
-	if (pthread_detach(philo->id))
-		return (kill(philo->pid, SIGKILL));
-	// printf ("id = %d time = %ld\n", philo->_id, philo->m_time.tv_sec * 1000 + philo->m_time.tv_usec / 1000);
-	ph_process(philo);
 	return (1);
-}
-
-int	all_destroy(t_m_data *m_data)
-{
-	int		i;
-	pid_t	_pid;
-
-	i = 0;
-	_pid = waitpid(-1, 0, 0);
-	printf ("pid = %d\n", _pid);
-	while (i < m_data->n_philo)
-	{
-		if (m_data->philo[i].pid != _pid)
-			kill(m_data->philo[i].pid, SIGKILL);
-		i++;
-	}
-	return (0);
 }
 
 int	main(int ag, char **av)
 {
 	t_m_data	m_data;
 	int			i;
-	struct timeval tmp;
 
 	i = 0;
 	if (!ft_init(ag, av, &m_data))
 		return (write(2, "Error!\n", 7));
 	if (!all_semaphors(&m_data))
 		return (write(2, "Error!\n", 7));
-	// gettimeofday(&m_data.m_time, NULL);
-	// printf ("time_main1 = %ld\n", m_data.m_time.tv_sec * 1000 + m_data.m_time.tv_usec / 1000);
-	// while (i < m_data.n_philo)
-	// {
-	// 	gettimeofday(&m_data.m_time, NULL);
-	// 	printf ("time_main2 = %ld\n", m_data.m_time.tv_sec * 1000 + m_data.m_time.tv_usec / 1000);
-	// 	m_data.philo[i].pid = fork();
-	// 	if (m_data.philo[i].pid == 0)
-	// 	{
-	// 		gettimeofday(&m_data.m_time, NULL);
-	// 		printf ("time_main3 = %ld\n", m_data.m_time.tv_sec * 1000 + m_data.m_time.tv_usec / 1000);
-	// 		sleep(1000);
-	// 	}
-	// 	i++;
-	// }
-	// gettimeofday(&m_data.m_time, NULL);
-	// printf ("time_main4 = %ld\n", m_data.m_time.tv_sec * 1000 + m_data.m_time.tv_usec / 1000);
 	while (i < m_data.n_philo)
 	{
 		m_data.philo[i].pid = fork();
 		if (m_data.philo[i].pid == 0)
 		{
-			// kill(m_data.philo[i].pid, SIGKILL);
-			// printf ("pid = %d\n", m_data.philo[i].pid);
-			if (!func(&m_data.philo[i]))
+			if (!child(&m_data.philo[i]))
 				return (write(2, "Error!\n", 7));
 		}
-		// printf ("pid = %d\n", m_data.philo[i].pid);
 		i++;
 	}
-	// printf ("time = %ld\n", m_data.m_time.tv_sec * 1000 + m_data.m_time.tv_usec / 1000);
 	all_destroy(&m_data);
-	// printf ("lol\n");
-	sem_close (m_data.fork);
-	sem_close (m_data.time);
-	sem_close (m_data.std_out);
-	sem_unlink("eat semaphor");
-	sem_unlink("time semaphor");
-	sem_unlink("out semaphor");
-
-	// sem_close("/eat semaphor")
-	// if (!ph_mutex_tread_all(&m_data))
-	// 	return (write(1, "Error!\n", 7));
-	// if (is_died(&m_data) == 5)
-	// {
-	// 	if (!all_destroy(&m_data))
-	// 		return (write(1, "Error!\n", 7));
-	// }
 	return (0);
 }

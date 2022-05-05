@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "philosophers_bonus.h"
 
 static void	check_fork(t_philo *philo)
 {
@@ -26,10 +26,11 @@ static void	check_fork(t_philo *philo)
 
 void	ph_process(t_philo *philo)
 {
+	usleep((philo->_id % 2) * 1000);
 	while (1)
 	{
 		if (philo->n_eat == 0)
-			return ;
+			break ;
 		check_fork(philo);
 		sem_wait(philo->std_out);
 		philo->n_eat--;
@@ -47,70 +48,63 @@ void	ph_process(t_philo *philo)
 		sem_post(philo->std_out);
 		usleep(900);
 	}
+	while (1)
+		usleep(200);
 }
 
-// int	m_fork(pthread_mutex_t *fork, int n, t_philo *philo, pthread_mutex_t *out)
-// {
-// 	int	i;
+static void	is_died(t_philo *philo)
+{
+	int				i;
+	struct timeval	tmp;
 
-// 	i = 0;
-// 	while (i < n)
-// 	{
-// 		if (pthread_mutex_init(&(fork[i]), NULL))
-// 			return (0);
-// 		philo[i].std_out = out;
-// 		philo[i].right = &(fork[i]);
-// 		i++;
-// 	}
-// 	i = 0;
-// 	while (i < n - 1)
-// 	{
-// 		philo[i].max = 0;
-// 		philo[i].left = philo[i + 1].right;
-// 		i++;
-// 	}
-// 	philo[i].left = philo[0].right;
-// 	philo[i].max = 1;
-// 	return (1);
-// }
+	i = -1;
+	while (1)
+	{
+		gettimeofday(&tmp, NULL);
+		if (time_count(&tmp, &philo->t_eat) > philo->_die)
+		{
+			sem_wait(philo->std_out);
+			if (check_eat(philo))
+				sem_post(philo->std_out);
+			else
+				print_status(philo, 4);
+			exit(EXIT_SUCCESS);
+		}
+		usleep(2000);
+	}
+	return ;
+}
 
-// static void	ph_init(t_m_data *m_data)
-// {
-// 	int	i;
+int	child(t_philo *philo)
+{
+	int	i;
 
-// 	i = 0;
-// 	while (i < m_data->n_philo)
-// 	{
-// 		m_data->philo[i].n_eat = m_data->n_eat;
-// 		m_data->philo[i].m_time = m_data->m_time;
-// 		m_data->philo[i]._id = i + 1;
-// 		m_data->philo[i].ms_eat = m_data->t_to_eat;
-// 		m_data->philo[i]._sleep = m_data->t_to_sleep;
-// 		m_data->philo[i].t_eat = m_data->m_time;
-// 		pthread_mutex_init(&m_data->philo[i].time, NULL);
-// 		i++;
-// 	}
-// }
+	i = 0;
+	if (pthread_create(&philo->id, NULL, (void *)&is_died, (void *)philo))
+		exit(EXIT_FAILURE);
+	if (pthread_detach(philo->id))
+		exit(EXIT_FAILURE);
+	ph_process(philo);
+	return (1);
+}
 
-// int	ph_mutex_tread_all(t_m_data *m_data)
-// {
-// 	int	i;
+int	all_destroy(t_m_data *m_data)
+{
+	int		i;
+	pid_t	_pid;
 
-// 	i = 0;
-// 	if (pthread_mutex_init(&(m_data->std_out), NULL))
-// 		return (0);
-// 	if (!m_fork(m_data->fork, m_data->n_philo, m_data->philo, &m_data->std_out))
-// 		return (0);
-// 	gettimeofday(&(m_data->m_time), NULL);
-// 	ph_init(m_data);
-// 	while (i < m_data->n_philo)
-// 	{
-// 		if (pthread_create(&m_data->philo[i].id, NULL, (void *)&ph_process, \
-// 				(void *)&m_data->philo[i]))
-// 			return (0);
-// 		if (pthread_detach(m_data->philo[i].id))
-// 			return (0);
-// 		i++;
-// 	}
-// 	return (1);
-// }
+	i = 0;
+	_pid = waitpid(-1, 0, 0);
+	i = 0;
+	while (i < m_data->n_philo)
+	{
+		if (m_data->philo[i].pid != _pid)
+			kill(m_data->philo[i].pid, SIGKILL);
+		i++;
+	}
+	sem_close (m_data->fork);
+	sem_close (m_data->std_out);
+	sem_unlink("eat semaphor");
+	sem_unlink("out semaphor");
+	return (0);
+}

@@ -10,27 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
-
-// printf ("timer = %ld\n", timer.tv_sec * 1000 + timer.tv_usec / 1000);
-// 	printf ("global = %ld\n", philo->m_time.tv_sec * 1000 + philo->m_time.tv_usec / 1000);
-// 	printf ("eat = %ld\n", philo->t_eat.tv_sec * 1000 + philo->t_eat.tv_usec / 1000);
-// 	printf ("FIRST = %d\n", philo->t_eat.tv_usec / 1000 - philo->m_time.tv_usec / 1000);
-// 	printf ("SECOND = %ld\n", timer.tv_sec * 1000 + timer.tv_usec / 1000 - philo->t_eat.tv_sec * 1000 + philo->t_eat.tv_usec / 1000);
-		
-// 		printf ("ID = %d GLOBAL - EAT = %ld\n", philo->_id, (timer.tv_sec - philo->m_time.tv_sec) / 1000 + \
-// 				(timer.tv_usec - philo->m_time.tv_usec) * 1000);
+#include "philosophers_bonus.h"
 
 int	print_status(t_philo *philo, int status)
 {
 	struct timeval	timer;
 
-	// sem_wait(philo->time);
 	gettimeofday(&timer, NULL);
 	if (status == 1)
 		gettimeofday(&philo->t_eat, NULL);
 	timer.tv_usec = time_count(&timer, &philo->m_time);
-	// sem_post(philo->time);
 	if (!status)
 		printf ("%d %d has taken a fork\n", timer.tv_usec, philo->_id);
 	else if (status == 1)
@@ -81,19 +70,3 @@ int	check_eat(t_philo *philo)
 		return (0);
 	return (1);
 }
-
-// int	all_destroy(t_m_data *m_data)
-// {
-// 	int	i;
-
-// 	i = 0;
-// 	while (i < m_data->n_philo)
-// 	{
-// 		if (pthread_mutex_destroy(&m_data->fork[i]))
-// 			return (0);
-// 		i++;
-// 	}
-// 	if (pthread_mutex_destroy(&m_data->std_out))
-// 		return (0);
-// 	return (1);
-// }
