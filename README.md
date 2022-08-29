@@ -11,6 +11,7 @@ cd philo && make.
 
 After that, you need to enter the arguments:
  ./philosopher number_philosophists time to eat time to eat time to sleep[number_of_times_each_philosopher_must_eat]
+ 
 Where
 
   ◦ number_of_philosophers: the number of philosophers, as well as the number
