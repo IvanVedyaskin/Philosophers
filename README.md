@@ -6,7 +6,7 @@ I learned how to create threads, got acquainted with mutexes and semaphores.
 # Instructions for launching Philosophers.
 
 There are 2 directories in this repository. The "philo" directory contains implementations using mutexes. To prepare the program for launch, you need to do: 
-cd philo && make. 
+cd philo && make.
 After that, you need to enter the arguments:
 ./philosopher number_philosophists time to eat time to eat time to sleep[number_of_times_each_philosopher_must_eat]
 Where 
