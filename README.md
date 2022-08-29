@@ -22,9 +22,9 @@ philosophers ate at least number_of_times_each_philosopher_must_eat
 once, the simulation stops. Unless otherwise specified, the simulation stops when
 the philosopher dies.
 
-Example./philo 4 410 200 200
+Example ./philo 4 410 200 200
 
 The program with semaphores runs the same way, only in a different directory:
 cd ./philo_bonus && make
 
-Example./philo_bonus 4 410 200 200
+Example ./philo_bonus 4 410 200 200
